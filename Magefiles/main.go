@@ -2,14 +2,31 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/magefile/mage/sh"
 )
 
 // init performs some sanity checks before running anything.
 func init() {
 	mustBeInRoot()
 	mustHaveInstalled("docker")
+}
+
+// Test tests the whole repo using Ginkgo test runner.
+func Test() error {
+	if err := sh.Run(
+		"go", "run", "-mod=readonly", "github.com/onsi/ginkgo/v2/ginkgo",
+		"-p", "-randomize-all", "-repeat=5", "--fail-on-pending", "--race", "--trace",
+		"--junit-report=test-report.xml",
+		"./...",
+	); err != nil {
+		return fmt.Errorf("failed to run ginkgo: %w", err)
+	}
+
+	return nil
 }
 
 // mustHaveInstalled checks if the following binaries are installed.
