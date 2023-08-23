@@ -1,17 +1,11 @@
 package lexer
 
 import (
-	"testing"
+	"unicode"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
-
-func TestLexer(t *testing.T) {
-	t.Parallel()
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "internal/lexer")
-}
 
 var _ = Describe("positions", func() {
 	It("next only", func() {
@@ -75,26 +69,10 @@ var _ = Describe("scanning controls", func() {
 	Describe("accept", func() {
 		It("digits", func() {
 			lex := NewScanner(`500 `)
-			lex.Accept(isDecimalDigit)
+			lex.Accept(unicode.IsDigit)
 
 			Expect(lex.start.Offset).To(Equal(0))
 			Expect(lex.curr.Offset).To(Equal(4))
-		})
-
-		It("unicode letters", func() {
-			lex := NewScanner(`ūβįβ1`)
-			lex.Accept(isUnicodeLetter)
-
-			Expect(lex.start.Offset).To(Equal(0))
-			Expect(lex.curr.Offset).To(Equal(9))
-		})
-
-		It("latin letters", func() {
-			lex := NewScanner(`abdc1`)
-			lex.Accept(isUnicodeLetter)
-
-			Expect(lex.start.Offset).To(Equal(0))
-			Expect(lex.curr.Offset).To(Equal(5))
 		})
 	})
 
@@ -114,9 +92,4 @@ var _ = Describe("scanning controls", func() {
 		Expect(lex.start.Offset).To(Equal(0))
 		Expect(lex.curr.Offset).To(Equal(1))
 	})
-
-	// It("should error state correctly", func() {
-	// 	out := New(`foobar `, func(lc LexControl) StateFunc { return lc.Errorf("foo") }).Run()
-	// 	Expect(fmt.Sprint(out)).To(Equal(`[0:0.0:ILLEGAL(foo)]`))
-	// })
 })

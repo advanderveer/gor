@@ -1,4 +1,5 @@
-package lexer
+// Package token describes the different tokens
+package token
 
 // Token type for set of lexical tokens.
 //
@@ -8,12 +9,6 @@ type Token int
 const (
 	// ILLEGAL indicates a lexical error.
 	ILLEGAL Token = iota
-	// EOF indicates the end of file.
-	EOF
-	// WS indicates a whitespace.
-	WS
-	// PACKAGE keyword.
-	PACKAGE
-	// IDENT is an identifier.
+	// IDENT encodes an identifier.
 	IDENT
 )

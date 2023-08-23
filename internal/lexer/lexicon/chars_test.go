@@ -1,4 +1,4 @@
-package lexer
+package lexicon
 
 import (
 	. "github.com/onsi/ginkgo/v2"

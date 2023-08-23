@@ -1,10 +1,14 @@
-package lexer
+package lexicon
 
-import "unicode"
+import (
+	"unicode"
+
+	"github.com/advanderveer/gor/internal/lexer"
+)
 
 // https://go.dev/ref/spec#newline
 func isNewline(r rune) bool {
-	return r == 0x000A //nolint:gomnd
+	return r == lexer.NewLine
 }
 
 // https://go.dev/ref/spec#unicode_char

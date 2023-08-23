@@ -3,6 +3,7 @@ package lexer
 
 import (
 	"fmt"
+	"go/token"
 	"strings"
 	"unicode/utf8"
 )
@@ -10,9 +11,13 @@ import (
 // special eof rune to indicate file has ended.
 const eof rune = -1
 
+// NewLine character used for human-readable scan. It is exported to
+// allow other packages to use the same character.
+const NewLine = 0x000A
+
 // Item encapsulates a scanned token.
 type Item struct {
-	Tok Token
+	Tok token.Token
 	Val string
 	Pos Pos
 }
@@ -45,6 +50,11 @@ func NewScanner(input string) *Scanner {
 	s := &Scanner{input: input}
 
 	return s
+}
+
+// Value returns the currently pending token value.
+func (s *Scanner) Value() string {
+	return s.input[s.start.Offset:s.curr.Offset]
 }
 
 // Pos returns the lex'ers position info.
@@ -96,7 +106,7 @@ func (s *Scanner) Peek() rune {
 func (s *Scanner) Backup() {
 	// update line information
 	prev, _ := utf8.DecodeRuneInString(s.input[s.curr.Offset-s.width:])
-	if isNewline(prev) {
+	if prev == NewLine {
 		s.curr.Column = 0
 		s.curr.Line--
 	} else {
@@ -120,7 +130,7 @@ func (s *Scanner) Next() rune {
 	s.curr.Offset += s.width
 
 	// update line information
-	if isNewline(curr) {
+	if curr == NewLine {
 		s.curr.Column = 0
 		s.curr.Line++
 	} else {
