@@ -33,6 +33,7 @@ linters:
     - ireturn # our oapi implementations return interfaces all the time
     - depguard # too agressive
     - tagliatelle # we have lots of aws tags that don't follow the standards
+    - testpackage # this is not wrong by definition
 
 issues:
   include:
