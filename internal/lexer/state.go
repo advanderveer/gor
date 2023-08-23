@@ -1,21 +1,5 @@
 package lexer
 
-// LexControl only exposes higher-level lexing controls to state functions.
-type LexControl interface {
-	Emit(Token)
-	Pos() Pos
-	Peek() rune
-	Ignore()
-	Backup()
-	Next() rune
-	Keyword(string) bool
-	Accept(func(rune) bool)
-	Errorf(string, ...any) StateFunc
-}
-
-// StateFunc defines what token is valid after another.
-type StateFunc func(LexControl) StateFunc
-
 // // lexWhiteSpace scans white space.
 // func lexWhiteSpace(lex LexControl) {
 // 	for {
