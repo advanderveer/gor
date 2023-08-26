@@ -7,7 +7,7 @@ import (
 )
 
 // https://go.dev/ref/spec#Identifiers
-func lexIdentifier(next lexer.State) func(lexer.Control) lexer.State {
+func lexIdentifierAndThen(next lexer.State) func(lexer.Control) lexer.State {
 	return func(lex lexer.Control) lexer.State {
 		chr := lex.Next()
 		if !isLetter(chr) {

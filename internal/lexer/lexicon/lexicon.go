@@ -31,7 +31,9 @@ func LexPackage(lex lexer.Control) lexer.State {
 
 		// @TODO: add implicit semi-colon?
 
-		return lexIdentifier(LexImports)
+		return lexIdentifierAndThen(LexImports)
+	case isCommentCharacter(chr):
+		return lexCommentAndThen(LexPackage)
 	default:
 		return lex.Unexpected(chr,
 			lexerr.ExpectedWhiteSpace,

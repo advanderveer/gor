@@ -16,11 +16,12 @@ func TestLexicon(t *testing.T) {
 }
 
 var _ = Describe("file", func() {
-	DescribeTable("just package", func(inp string, expOut string) {
-		out := lexer.New(inp, LexPackage).Lex()
+	DescribeTable("just package", func(inp string, expErr OmegaMatcher, expOut string) {
+		out, err := lexer.New(inp, LexPackage).Lex()
+		Expect(err).To(expErr)
 		Expect(fmt.Sprint(out)).To(Equal(expOut))
 	},
-		Entry("1", ` package foo`, `[1:0.1:PACKAGE(package) 9:0.9:IDENT(foo)]`),
-		Entry("2", " \n "+`package foo`, `[3:1.1:PACKAGE(package) 11:1.9:IDENT(foo)]`),
+		Entry("1", ` package foo`, BeNil(), `[1:0.1:PACKAGE(package) 9:0.9:IDENT(foo)]`),
+		Entry("2", " \n "+`package foo`, BeNil(), `[3:1.1:PACKAGE(package) 11:1.9:IDENT(foo)]`),
 	)
 })

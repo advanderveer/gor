@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/advanderveer/gor/internal/lexer/lexerr"
@@ -83,11 +84,17 @@ func (l *Lexer) Fail(err error) State {
 	return nil
 }
 
-// Lex runs the lexer over the input source code.
-func (l *Lexer) Lex() []Item {
+// Lex runs the lexer over the input source code. If any item contains an error
+// they are joined into a single error and returned here.
+func (l *Lexer) Lex() ([]Item, error) {
 	for l.state != nil {
 		l.state = l.state(l)
 	}
 
-	return l.output
+	var err error
+	for _, it := range l.output {
+		err = errors.Join(err, it.Err)
+	}
+
+	return l.output, err
 }

@@ -52,8 +52,8 @@ var _ = Describe("char assertions", func() {
 	})
 
 	It("comment", func() {
-		Expect(isComment('/')).To(BeTrue())
-		Expect(isComment('\\')).To(BeFalse())
+		Expect(isCommentCharacter('/')).To(BeTrue())
+		Expect(isCommentCharacter('\\')).To(BeFalse())
 	})
 
 	It("eof", func() {

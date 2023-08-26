@@ -12,8 +12,8 @@ func isWhiteSpace(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\r' || isNewline(r)
 }
 
-// isComment return true if its the comment character.
-func isComment(r rune) bool {
+// isCommentCharacter return true if its the comment character.
+func isCommentCharacter(r rune) bool {
 	return r == '/'
 }
 

@@ -17,10 +17,12 @@ const (
 	ExpectedPackageKeyword ExpectCode = iota // 'package' keyword
 	// ExpectedLetter codes the expectation of a letter.
 	ExpectedLetter // letter
-	// ExpectedWhiteSpace codes the expectation for a white space.
+	// ExpectedWhiteSpace codes the expectation of a white space.
 	ExpectedWhiteSpace // white space
-	// ExpectedUnicodeLetter codes the expectation for a unicode letter.
+	// ExpectedUnicodeLetter codes the expectation of a unicode letter.
 	ExpectedUnicodeLetter // unicode letter
+	// ExpectedComment codes the expectation of a comment.
+	ExpectedComment // comment
 )
 
 // UnexpectedError encodes the error for an unexpected character during tokenization.

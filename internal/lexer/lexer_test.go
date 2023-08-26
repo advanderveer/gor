@@ -1,11 +1,11 @@
 package lexer_test
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/advanderveer/gor/internal/lexer"
+	"github.com/advanderveer/gor/internal/lexer/lexerr"
 	"github.com/advanderveer/gor/internal/lexer/token"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -19,20 +19,22 @@ func TestLexer(t *testing.T) {
 }
 
 var _ = Describe("lexing", func() {
-	It("should emit error state", func() {
-		out := lexer.New(`foobar `, func(lc lexer.Control) lexer.State {
-			return lc.Fail(errors.New("foo"))
+	It("should emit and return errors", func() {
+		out, err := lexer.New(`foobar `, func(lc lexer.Control) lexer.State {
+			return lc.Unexpected('x', lexerr.ExpectedComment)
 		}).Lex()
-		Expect(fmt.Sprint(out)).To(Equal(`[0:0.0:ILLEGAL(foo)]`))
+		Expect(fmt.Sprint(out)).To(Equal(`[0:0.0:ILLEGAL(unexpected input 'x', expected: comment)]`))
+		Expect(err).To(MatchError(MatchRegexp(`unexpected input`)))
 	})
 
 	It("should emit regular token", func() {
-		out := lexer.New(`foobar `, func(lc lexer.Control) lexer.State {
+		out, err := lexer.New(`foobar `, func(lc lexer.Control) lexer.State {
 			lc.Emit(token.IDENT)
 
 			return nil
 		}).Lex()
 
+		Expect(err).ToNot(HaveOccurred())
 		Expect(fmt.Sprint(out)).To(Equal(`[0:0.0:IDENT()]`))
 	})
 })
