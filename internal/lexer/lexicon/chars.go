@@ -6,6 +6,22 @@ import (
 	"github.com/advanderveer/gor/internal/lexer"
 )
 
+// https://go.dev/ref/spec#Tokens: White space, formed from spaces (U+0020), horizontal tabs (U+0009),
+// carriage returns (U+000D), and newlines (U+000A).
+func isWhiteSpace(r rune) bool {
+	return r == ' ' || r == '\t' || r == '\r' || isNewline(r)
+}
+
+// isComment return true if its the comment character.
+func isComment(r rune) bool {
+	return r == '/'
+}
+
+// isEOF return true if the rune is the special EOF indicator.
+func isEOF(r rune) bool {
+	return r == lexer.EOF
+}
+
 // https://go.dev/ref/spec#newline
 func isNewline(r rune) bool {
 	return r == lexer.NewLine

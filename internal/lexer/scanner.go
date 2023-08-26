@@ -3,28 +3,18 @@ package lexer
 
 import (
 	"fmt"
-	"go/token"
 	"strings"
 	"unicode/utf8"
 )
 
-// special eof rune to indicate file has ended.
-const eof rune = -1
+const (
+	// NewLine character used for human-readable scan. It is exported to
+	// allow other packages to use the same character.
+	NewLine = 0x000A
 
-// NewLine character used for human-readable scan. It is exported to
-// allow other packages to use the same character.
-const NewLine = 0x000A
-
-// Item encapsulates a scanned token.
-type Item struct {
-	Tok token.Token
-	Val string
-	Pos Pos
-}
-
-func (it Item) String() string {
-	return fmt.Sprintf("%s:%s(%s)", it.Pos, it.Tok, it.Val)
-}
+	// EOF represents a special EOF rune to indicate file has ended.
+	EOF rune = -1
+)
 
 // Pos describes an understandable position in a file.
 type Pos struct {
@@ -62,11 +52,25 @@ func (s *Scanner) Pos() Pos {
 	return s.curr
 }
 
+// Skip runes for the pending token until 'f' returns false.
+func (s *Scanner) Skip(f func(rune) bool) {
+	for {
+		if !f(s.Next()) {
+			s.Backup()
+			s.Ignore()
+
+			return
+		}
+	}
+}
+
 // Accept runes for the pending token until 'f' returns false.
 func (s *Scanner) Accept(f func(rune) bool) {
 	for {
 		if !f(s.Next()) {
-			break
+			s.Backup()
+
+			return
 		}
 	}
 }
@@ -78,7 +82,6 @@ func (s *Scanner) Keyword(word string) bool {
 		for i := 0; i < utf8.RuneCountInString(word); i++ {
 			s.Next()
 		}
-		s.Ignore() // keyword itself is never important
 
 		return true
 	}
@@ -122,7 +125,7 @@ func (s *Scanner) Next() rune {
 	if s.curr.Offset >= len(s.input) {
 		s.width = 0
 
-		return eof
+		return EOF
 	}
 
 	var curr rune

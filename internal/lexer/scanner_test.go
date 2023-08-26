@@ -11,7 +11,7 @@ var _ = Describe("positions", func() {
 	It("next only", func() {
 		lex := NewScanner("a\n\nb")
 		for {
-			if lex.Next() == eof {
+			if lex.Next() == EOF {
 				break
 			}
 		}
@@ -54,7 +54,7 @@ var _ = Describe("scanning controls", func() {
 		It("succeed", func() {
 			lex := NewScanner(`foo`)
 			Expect(lex.Keyword("foo")).To(BeTrue())
-			Expect(lex.start.Offset).To(Equal(3))
+			Expect(lex.start.Offset).To(Equal(0))
 			Expect(lex.curr.Offset).To(Equal(3))
 		})
 
@@ -66,13 +66,23 @@ var _ = Describe("scanning controls", func() {
 		})
 	})
 
-	Describe("accept", func() {
-		It("digits", func() {
+	Describe("accept/skip", func() {
+		It("accept digits", func() {
 			lex := NewScanner(`500 `)
 			lex.Accept(unicode.IsDigit)
 
 			Expect(lex.start.Offset).To(Equal(0))
-			Expect(lex.curr.Offset).To(Equal(4))
+			Expect(lex.curr.Offset).To(Equal(3))
+
+			Expect(lex.Value()).To(Equal(`500`))
+		})
+
+		It("skip digits", func() {
+			lex := NewScanner(`213a `)
+			lex.Skip(unicode.IsDigit)
+
+			Expect(lex.start.Offset).To(Equal(3))
+			Expect(lex.curr.Offset).To(Equal(3))
 		})
 	})
 

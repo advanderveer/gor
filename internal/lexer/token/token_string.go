@@ -10,11 +10,12 @@ func _() {
 	var x [1]struct{}
 	_ = x[ILLEGAL-0]
 	_ = x[IDENT-1]
+	_ = x[PACKAGE-2]
 }
 
-const _Token_name = "ILLEGALIDENT"
+const _Token_name = "ILLEGALIDENTPACKAGE"
 
-var _Token_index = [...]uint8{0, 7, 12}
+var _Token_index = [...]uint8{0, 7, 12, 19}
 
 func (i Token) String() string {
 	if i < 0 || i >= Token(len(_Token_index)-1) {

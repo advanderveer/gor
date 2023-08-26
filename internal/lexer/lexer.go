@@ -2,7 +2,9 @@ package lexer
 
 import (
 	"fmt"
-	"go/token"
+
+	"github.com/advanderveer/gor/internal/lexer/lexerr"
+	"github.com/advanderveer/gor/internal/lexer/token"
 )
 
 // Control exposes the combined scanning and lexing controls to state functions
@@ -17,11 +19,25 @@ type Control interface {
 	Next() rune
 	Keyword(string) bool
 	Accept(func(rune) bool)
-	Errorf(string, ...any) State
+	Skip(func(rune) bool)
+	Fail(error) State
+	Unexpected(r rune, exp lexerr.ExpectCode, more ...lexerr.ExpectCode) State
 }
 
 // State defines a state that the lexer can be in.
 type State func(Control) State
+
+// Item encapsulates a scanned token.
+type Item struct {
+	Tok token.Token
+	Val string
+	Err error
+	Pos Pos
+}
+
+func (it Item) String() string {
+	return fmt.Sprintf("%s:%s(%s)", it.Pos, it.Tok, it.Val)
+}
 
 // Lexer implements Gor lexer.
 type Lexer struct {
@@ -49,12 +65,18 @@ func (l *Lexer) Emit(tok token.Token) {
 	l.start = l.curr
 }
 
-// Errorf makes the lexer enter the error state while emitting
+// Unexpected fails the lexer while setting the fail state with a unexpected character error.
+func (l *Lexer) Unexpected(r rune, exp lexerr.ExpectCode, more ...lexerr.ExpectCode) State {
+	return l.Fail(lexerr.Unexpected(r, exp, more...))
+}
+
+// Fail makes the lexer enter the error state while emitting
 // an error token for the developer.
-func (l *Lexer) Errorf(format string, args ...any) State {
+func (l *Lexer) Fail(err error) State {
 	l.output = append(l.output, Item{
 		Tok: token.ILLEGAL,
-		Val: fmt.Sprintf(format, args...),
+		Val: err.Error(),
+		Err: err,
 		Pos: l.curr,
 	})
 

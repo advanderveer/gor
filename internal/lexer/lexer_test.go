@@ -1,11 +1,13 @@
 package lexer_test
 
 import (
+	"errors"
 	"fmt"
-	"go/token"
 	"testing"
 
 	"github.com/advanderveer/gor/internal/lexer"
+	"github.com/advanderveer/gor/internal/lexer/token"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -18,7 +20,9 @@ func TestLexer(t *testing.T) {
 
 var _ = Describe("lexing", func() {
 	It("should emit error state", func() {
-		out := lexer.New(`foobar `, func(lc lexer.Control) lexer.State { return lc.Errorf("foo") }).Lex()
+		out := lexer.New(`foobar `, func(lc lexer.Control) lexer.State {
+			return lc.Fail(errors.New("foo"))
+		}).Lex()
 		Expect(fmt.Sprint(out)).To(Equal(`[0:0.0:ILLEGAL(foo)]`))
 	})
 

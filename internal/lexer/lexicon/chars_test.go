@@ -42,4 +42,22 @@ var _ = Describe("char assertions", func() {
 		Expect(isDecimalDigit('0')).To(BeTrue())
 		Expect(isDecimalDigit('9')).To(BeTrue())
 	})
+
+	It("whitespace", func() {
+		Expect(isWhiteSpace(' ')).To(BeTrue())
+		Expect(isWhiteSpace('\t')).To(BeTrue())
+		Expect(isWhiteSpace('\r')).To(BeTrue())
+		Expect(isWhiteSpace('\n')).To(BeTrue())
+		Expect(isWhiteSpace('a')).To(BeFalse())
+	})
+
+	It("comment", func() {
+		Expect(isComment('/')).To(BeTrue())
+		Expect(isComment('\\')).To(BeFalse())
+	})
+
+	It("eof", func() {
+		Expect(isEOF(-1)).To(BeTrue())
+		Expect(isEOF('0')).To(BeFalse())
+	})
 })

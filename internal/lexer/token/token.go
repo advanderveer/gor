@@ -11,4 +11,6 @@ const (
 	ILLEGAL Token = iota
 	// IDENT encodes an identifier.
 	IDENT
+	// PACKAGE keyword.
+	PACKAGE
 )
