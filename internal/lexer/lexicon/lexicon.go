@@ -35,6 +35,7 @@ func LexPackage(lex lexer.Control) lexer.State {
 	default:
 		return lex.Unexpected(chr,
 			lexerr.ExpectedWhiteSpace,
+			lexerr.ExpectedComment,
 			lexerr.ExpectedUnicodeLetter)
 	}
 }
