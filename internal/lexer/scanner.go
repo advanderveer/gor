@@ -53,11 +53,17 @@ func (s *Scanner) Pos() Pos {
 }
 
 // Skip runes for the pending token until 'f' returns false.
-func (s *Scanner) Skip(f func(rune) bool) {
+func (s *Scanner) Skip(fnc func(rune) bool) {
+	defer s.Ignore()
+
 	for {
-		if !f(s.Next()) {
+		r := s.Next()
+		if r == EOF {
+			return
+		}
+
+		if !fnc(r) {
 			s.Backup()
-			s.Ignore()
 
 			return
 		}
@@ -65,9 +71,14 @@ func (s *Scanner) Skip(f func(rune) bool) {
 }
 
 // Accept runes for the pending token until 'f' returns false.
-func (s *Scanner) Accept(f func(rune) bool) {
+func (s *Scanner) Accept(fnc func(rune) bool) {
 	for {
-		if !f(s.Next()) {
+		r := s.Next()
+		if r == EOF {
+			return
+		}
+
+		if !fnc(r) {
 			s.Backup()
 
 			return

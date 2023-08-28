@@ -13,11 +13,13 @@ func _() {
 	_ = x[ExpectedWhiteSpace-2]
 	_ = x[ExpectedUnicodeLetter-3]
 	_ = x[ExpectedComment-4]
+	_ = x[FirstCommentCharacter-5]
+	_ = x[SecondCommentCharacter-6]
 }
 
-const _ExpectCode_name = "'package' keywordletterwhite spaceunicode lettercomment"
+const _ExpectCode_name = "'package' keywordletterwhite spaceunicode lettercommentfirst comment charactersecond comment character"
 
-var _ExpectCode_index = [...]uint8{0, 17, 23, 34, 48, 55}
+var _ExpectCode_index = [...]uint8{0, 17, 23, 34, 48, 55, 78, 102}
 
 func (i ExpectCode) String() string {
 	if i < 0 || i >= ExpectCode(len(_ExpectCode_index)-1) {

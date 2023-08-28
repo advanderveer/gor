@@ -77,12 +77,30 @@ var _ = Describe("scanning controls", func() {
 			Expect(lex.Value()).To(Equal(`500`))
 		})
 
+		It("accept all until eof", func() {
+			lex := NewScanner(`70a_0`)
+			lex.Accept(func(r rune) bool { return r != '\n' })
+
+			Expect(lex.start.Offset).To(Equal(0))
+			Expect(lex.curr.Offset).To(Equal(5))
+
+			Expect(lex.Value()).To(Equal(`70a_0`))
+		})
+
 		It("skip digits", func() {
 			lex := NewScanner(`213a `)
 			lex.Skip(unicode.IsDigit)
 
 			Expect(lex.start.Offset).To(Equal(3))
 			Expect(lex.curr.Offset).To(Equal(3))
+		})
+
+		It("skip all until eof", func() {
+			lex := NewScanner(`213*x `)
+			lex.Skip(func(r rune) bool { return r != '\n' })
+
+			Expect(lex.start.Offset).To(Equal(6))
+			Expect(lex.curr.Offset).To(Equal(6))
 		})
 	})
 

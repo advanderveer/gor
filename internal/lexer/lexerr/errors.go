@@ -23,6 +23,10 @@ const (
 	ExpectedUnicodeLetter // unicode letter
 	// ExpectedComment codes the expectation of a comment.
 	ExpectedComment // comment
+	// FirstCommentCharacter codes the expectation for the comment first forward slash.
+	FirstCommentCharacter // first comment character
+	// SecondCommentCharacter codes the expectation for the comment Second forward slash.
+	SecondCommentCharacter // second comment character
 )
 
 // UnexpectedError encodes the error for an unexpected character during tokenization.

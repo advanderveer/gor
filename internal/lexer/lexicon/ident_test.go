@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("identifiers", func() {
-	DescribeTable("acceptIdentifier", func(input string, expErr OmegaMatcher, expOutput string) {
+	DescribeTable("lex identifiers", func(input string, expErr OmegaMatcher, expOutput string) {
 		out, err := lexer.New(input, lexIdentifierAndThen(nil)).Lex()
 		Expect(err).To(expErr)
 		Expect(fmt.Sprint(out)).To(Equal(expOutput))

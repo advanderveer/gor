@@ -23,5 +23,15 @@ var _ = Describe("file", func() {
 	},
 		Entry("1", ` package foo`, BeNil(), `[1:0.1:PACKAGE(package) 9:0.9:IDENT(foo)]`),
 		Entry("2", " \n "+`package foo`, BeNil(), `[3:1.1:PACKAGE(package) 11:1.9:IDENT(foo)]`),
+		Entry("3", " \n "+`x`, MatchError(MatchRegexp(`'package' keyword`)),
+			`[3:1.1:ILLEGAL(unexpected input 'x', expected: 'package' keyword)]`),
+		Entry("4", " \n "+`x`, MatchError(MatchRegexp(`'package' keyword`)),
+			`[3:1.1:ILLEGAL(unexpected input 'x', expected: 'package' keyword)]`),
+		Entry("5", `
+			// comment 1
+
+			// comment 2
+			package foo
+		`, BeNil(), `[6:1.5:COMMENT( comment 1) 23:3.5:COMMENT( comment 2) 37:4.3:PACKAGE(package) 45:4.11:IDENT(foo)]`),
 	)
 })

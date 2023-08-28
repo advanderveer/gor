@@ -13,4 +13,6 @@ const (
 	IDENT
 	// PACKAGE keyword.
 	PACKAGE
+	// COMMENT holds source code comments.
+	COMMENT
 )

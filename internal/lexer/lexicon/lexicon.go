@@ -29,8 +29,6 @@ func LexPackage(lex lexer.Control) lexer.State {
 		lex.Emit(token.PACKAGE)
 		lex.Skip(isWhiteSpace)
 
-		// @TODO: add implicit semi-colon?
-
 		return lexIdentifierAndThen(LexImports)
 	case isCommentCharacter(chr):
 		return lexCommentAndThen(LexPackage)
