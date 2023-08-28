@@ -9,17 +9,22 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[ExpectedPackageKeyword-0]
-	_ = x[ExpectedLetter-1]
-	_ = x[ExpectedWhiteSpace-2]
-	_ = x[ExpectedUnicodeLetter-3]
-	_ = x[ExpectedComment-4]
-	_ = x[FirstCommentCharacter-5]
-	_ = x[SecondCommentCharacter-6]
+	_ = x[ExpectedImportKeyword-1]
+	_ = x[ExpectedLetter-2]
+	_ = x[ExpectedWhiteSpace-3]
+	_ = x[ExpectedUnicodeLetter-4]
+	_ = x[ExpectedComment-5]
+	_ = x[FirstCommentCharacter-6]
+	_ = x[SecondCommentCharacter-7]
+	_ = x[ExpectedLeftParenthesis-8]
+	_ = x[ExpectedRightParenthesis-9]
+	_ = x[ExpectedStringLiteral-10]
+	_ = x[ExpectedDoubleQuote-11]
 }
 
-const _ExpectCode_name = "'package' keywordletterwhite spaceunicode lettercommentfirst comment charactersecond comment character"
+const _ExpectCode_name = "'package' keyword'import' keywordletterwhite spaceunicode lettercommentfirst comment charactersecond comment characterleft parenthesisright parenthesisstring literaldouble quote"
 
-var _ExpectCode_index = [...]uint8{0, 17, 23, 34, 48, 55, 78, 102}
+var _ExpectCode_index = [...]uint8{0, 17, 33, 39, 50, 64, 71, 94, 118, 134, 151, 165, 177}
 
 func (i ExpectCode) String() string {
 	if i < 0 || i >= ExpectCode(len(_ExpectCode_index)-1) {

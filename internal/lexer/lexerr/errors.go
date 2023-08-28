@@ -15,6 +15,8 @@ type ExpectCode int
 const (
 	// ExpectedPackageKeyword codes the expectation of a package keyword.
 	ExpectedPackageKeyword ExpectCode = iota // 'package' keyword
+	// ExpectedImportKeyword codes the expectation of a import keyword.
+	ExpectedImportKeyword // 'import' keyword
 	// ExpectedLetter codes the expectation of a letter.
 	ExpectedLetter // letter
 	// ExpectedWhiteSpace codes the expectation of a white space.
@@ -27,6 +29,14 @@ const (
 	FirstCommentCharacter // first comment character
 	// SecondCommentCharacter codes the expectation for the comment Second forward slash.
 	SecondCommentCharacter // second comment character
+	// ExpectedLeftParenthesis codes the expectation for the left parenthesis.
+	ExpectedLeftParenthesis // left parenthesis
+	// ExpectedRightParenthesis codes the expectation for the right parenthesis.
+	ExpectedRightParenthesis // right parenthesis
+	// ExpectedStringLiteral codes the expectation for a string literal.
+	ExpectedStringLiteral // string literal
+	// ExpectedDoubleQuote codes the expectation for a double quote.
+	ExpectedDoubleQuote // double quote
 )
 
 // UnexpectedError encodes the error for an unexpected character during tokenization.

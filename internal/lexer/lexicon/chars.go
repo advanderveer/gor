@@ -12,6 +12,21 @@ func isWhiteSpace(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\r' || isNewline(r)
 }
 
+// isDoubleQuote returns true if the rune is a double quote.
+func isDoubleQuote(r rune) bool {
+	return r == '"'
+}
+
+// isLeftParen returns the rune for a left parenthesis.
+func isLeftParen(r rune) bool {
+	return r == '('
+}
+
+// isRightParen returns the rune for a right parenthesis.
+func isRightParen(r rune) bool {
+	return r == ')'
+}
+
 // isCommentCharacter return true if its the comment character.
 func isCommentCharacter(r rune) bool {
 	return r == '/'

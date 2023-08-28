@@ -13,6 +13,14 @@ const (
 	IDENT
 	// PACKAGE keyword.
 	PACKAGE
+	// IMPORT keyword.
+	IMPORT
 	// COMMENT holds source code comments.
 	COMMENT
+	// LPAREN is a left parenthesis.
+	LPAREN
+	// RPAREN is a right parenthesis.
+	RPAREN
+	// STRING describes a string literal.
+	STRING
 )

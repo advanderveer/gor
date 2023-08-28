@@ -7,11 +7,6 @@ import (
 	"github.com/advanderveer/gor/internal/lexer/token"
 )
 
-// LexImports implements lexing of import statements.
-func LexImports(lexer.Control) lexer.State {
-	return nil
-}
-
 // LexPackage implements lexing of a file's package declaration.
 func LexPackage(lex lexer.Control) lexer.State {
 	chr := lex.Peek()
@@ -29,7 +24,7 @@ func LexPackage(lex lexer.Control) lexer.State {
 		lex.Emit(token.PACKAGE)
 		lex.Skip(isWhiteSpace)
 
-		return lexIdentifierAndThen(LexImports)
+		return lexIdentifierAndThen(lexImports)
 	case isCommentCharacter(chr):
 		return lexCommentAndThen(LexPackage)
 	default:

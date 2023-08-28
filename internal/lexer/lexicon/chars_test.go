@@ -60,4 +60,17 @@ var _ = Describe("char assertions", func() {
 		Expect(isEOF(-1)).To(BeTrue())
 		Expect(isEOF('0')).To(BeFalse())
 	})
+
+	It("parenthesis", func() {
+		Expect(isLeftParen('(')).To(BeTrue())
+		Expect(isLeftParen(')')).To(BeFalse())
+
+		Expect(isRightParen(')')).To(BeTrue())
+		Expect(isRightParen('(')).To(BeFalse())
+	})
+
+	It("eof", func() {
+		Expect(isDoubleQuote('"')).To(BeTrue())
+		Expect(isDoubleQuote('\'')).To(BeFalse())
+	})
 })
