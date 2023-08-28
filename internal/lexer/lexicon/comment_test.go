@@ -12,7 +12,7 @@ var _ = Describe("comments", func() {
 		out, err := lexer.New(input, lexCommentAndThen(nil)).Lex()
 		Expect(err).To(expErr)
 		if err == nil {
-			Expect(out).To(TokenValuesToBeEqual(expOut))
+			Expect(out).To(lexer.TokenValuesToBeEqual(expOut))
 		}
 	},
 		Entry(`1`, `// foo`, BeNil(), T(token.COMMENT, " foo")),

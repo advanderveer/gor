@@ -12,7 +12,7 @@ var _ = Describe("identifiers", func() {
 		out, err := lexer.New(input, lexIdentifierAndThen(nil)).Lex()
 		Expect(err).To(expErr)
 		if err == nil {
-			Expect(out).To(TokenValuesToBeEqual(expOut))
+			Expect(out).To(lexer.TokenValuesToBeEqual(expOut))
 		}
 	},
 		Entry("1", `a`, BeNil(), T(token.IDENT, `a`)),
