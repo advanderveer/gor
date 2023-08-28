@@ -12,10 +12,15 @@ func LexPackage(lex lexer.Control) lexer.State {
 	chr := lex.Peek()
 
 	switch {
+	// skip over any whitespace
 	case isWhiteSpace(chr):
 		lex.Skip(isWhiteSpace)
 
 		return LexPackage
+	// tokenize any comments before the package keyword
+	case isCommentCharacter(chr):
+		return lexCommentAndThen(LexPackage)
+	// package keyword
 	case isUnicodeLetter(chr):
 		if !lex.Keyword("package") {
 			return lex.Unexpected(chr, lexerr.ExpectedPackageKeyword)
@@ -25,8 +30,6 @@ func LexPackage(lex lexer.Control) lexer.State {
 		lex.Skip(isWhiteSpace)
 
 		return lexIdentifierAndThen(lexImports)
-	case isCommentCharacter(chr):
-		return lexCommentAndThen(LexPackage)
 	default:
 		return lex.Unexpected(chr,
 			lexerr.ExpectedWhiteSpace,

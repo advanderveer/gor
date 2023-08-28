@@ -11,23 +11,27 @@ func lexImportSpec(lex lexer.Control) lexer.State {
 	chr := lex.Peek()
 
 	switch {
+	// skip any whitespace
 	case isWhiteSpace(chr):
 		lex.Skip(isWhiteSpace)
 
 		return lexImportSpec
+	// unnamed import
 	case isDoubleQuote(chr):
 		return lexStringLiteralAndThen(lexImportSpec)
+	// import package under a name
 	case isLetter(chr):
 		return lexIdentifierAndThen(func(c lexer.Control) lexer.State {
 			lex.Skip(isWhiteSpace)
 
 			return lexStringLiteralAndThen(lexImportSpec)
 		})
+	// close import statement
 	case isRightParen(chr):
 		lex.Next()
 		lex.Emit(token.RPAREN)
 
-		return lexDecls
+		return lexDecls // transition to declaration lexing
 	default:
 		return lex.Unexpected(chr,
 			lexerr.ExpectedWhiteSpace,
@@ -42,12 +46,15 @@ func lexImports(lex lexer.Control) lexer.State {
 	chr := lex.Peek()
 
 	switch {
+	// file may end
 	case isEOF(chr):
-		return nil // done
+		return nil
+	// skip over any whitespace
 	case isWhiteSpace(chr):
 		lex.Skip(isWhiteSpace)
 
 		return lexImports
+	// import statement start
 	case isUnicodeLetter(chr):
 		if !lex.Keyword("import") {
 			return lex.Unexpected(chr, lexerr.ExpectedImportKeyword)
@@ -64,6 +71,7 @@ func lexImports(lex lexer.Control) lexer.State {
 		lex.Emit(token.LPAREN)
 
 		return lexImportSpec
+	// tokenize comments before import statement
 	case isCommentCharacter(chr):
 		return lexCommentAndThen(lexImports)
 	default:

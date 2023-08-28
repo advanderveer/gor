@@ -12,6 +12,7 @@ func lexStringLiteralAndThen(next lexer.State) func(lexer.Control) lexer.State {
 		chr := lex.Peek()
 
 		switch {
+		// interpreted string literal
 		case isDoubleQuote(chr):
 			lex.Next()
 			lex.Ignore()
