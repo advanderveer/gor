@@ -35,15 +35,12 @@ var _ = DescribeTable("imports", func(inp string, expErr OmegaMatcher, expOut ..
 		T(token.STRING, `bar`),
 		T(token.RPAREN, `)`),
 	),
-	Entry("4", ` asdf`, MatchError(
-		MatchRegexp(`expected: 'import' keyword`))),
 	Entry("4", `importa`, MatchError(
 		MatchRegexp(`expected: left parenthesis`))),
 	Entry("6", ` import (  1)`, MatchError(
 		MatchRegexp(`expected: white space, letter or string literal`))),
 	Entry("7", `!`, MatchError(
-		MatchRegexp(`expected: white space, comment or unicode letter`))),
-
+		MatchRegexp(`expected: white space, comment or 'import' keyword`))),
 	Entry("8", ` import(foo"foo""bar")`, BeNil(),
 		T(token.IMPORT, `import`),
 		T(token.LPAREN, `(`),

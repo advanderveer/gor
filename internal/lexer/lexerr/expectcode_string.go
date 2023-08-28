@@ -10,21 +10,23 @@ func _() {
 	var x [1]struct{}
 	_ = x[ExpectedPackageKeyword-0]
 	_ = x[ExpectedImportKeyword-1]
-	_ = x[ExpectedLetter-2]
-	_ = x[ExpectedWhiteSpace-3]
-	_ = x[ExpectedUnicodeLetter-4]
-	_ = x[ExpectedComment-5]
-	_ = x[FirstCommentCharacter-6]
-	_ = x[SecondCommentCharacter-7]
-	_ = x[ExpectedLeftParenthesis-8]
-	_ = x[ExpectedRightParenthesis-9]
-	_ = x[ExpectedStringLiteral-10]
-	_ = x[ExpectedDoubleQuote-11]
+	_ = x[ExpectedFuncKeyword-2]
+	_ = x[ExpectedVarKeyword-3]
+	_ = x[ExpectedConstKeyword-4]
+	_ = x[ExpectedLetter-5]
+	_ = x[ExpectedWhiteSpace-6]
+	_ = x[ExpectedComment-7]
+	_ = x[FirstCommentCharacter-8]
+	_ = x[SecondCommentCharacter-9]
+	_ = x[ExpectedLeftParenthesis-10]
+	_ = x[ExpectedRightParenthesis-11]
+	_ = x[ExpectedStringLiteral-12]
+	_ = x[ExpectedDoubleQuote-13]
 }
 
-const _ExpectCode_name = "'package' keyword'import' keywordletterwhite spaceunicode lettercommentfirst comment charactersecond comment characterleft parenthesisright parenthesisstring literaldouble quote"
+const _ExpectCode_name = "'package' keyword'import' keyword'func' keyword'var' keyword'const' keywordletterwhite spacecommentfirst comment charactersecond comment characterleft parenthesisright parenthesisstring literaldouble quote"
 
-var _ExpectCode_index = [...]uint8{0, 17, 33, 39, 50, 64, 71, 94, 118, 134, 151, 165, 177}
+var _ExpectCode_index = [...]uint8{0, 17, 33, 47, 60, 75, 81, 92, 99, 122, 146, 162, 179, 193, 205}
 
 func (i ExpectCode) String() string {
 	if i < 0 || i >= ExpectCode(len(_ExpectCode_index)-1) {

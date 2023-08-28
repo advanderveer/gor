@@ -55,11 +55,7 @@ func lexImports(lex lexer.Control) lexer.State {
 
 		return lexImports
 	// import statement start
-	case isUnicodeLetter(chr):
-		if !lex.Keyword("import") {
-			return lex.Unexpected(chr, lexerr.ExpectedImportKeyword)
-		}
-
+	case lex.Keyword("import"):
 		lex.Emit(token.IMPORT)
 		lex.Skip(isWhiteSpace)
 
@@ -78,6 +74,6 @@ func lexImports(lex lexer.Control) lexer.State {
 		return lex.Unexpected(chr,
 			lexerr.ExpectedWhiteSpace,
 			lexerr.ExpectedComment,
-			lexerr.ExpectedUnicodeLetter)
+			lexerr.ExpectedImportKeyword)
 	}
 }

@@ -21,11 +21,7 @@ func LexPackage(lex lexer.Control) lexer.State {
 	case isCommentCharacter(chr):
 		return lexCommentAndThen(LexPackage)
 	// package keyword
-	case isUnicodeLetter(chr):
-		if !lex.Keyword("package") {
-			return lex.Unexpected(chr, lexerr.ExpectedPackageKeyword)
-		}
-
+	case lex.Keyword("package"):
 		lex.Emit(token.PACKAGE)
 		lex.Skip(isWhiteSpace)
 
@@ -34,6 +30,6 @@ func LexPackage(lex lexer.Control) lexer.State {
 		return lex.Unexpected(chr,
 			lexerr.ExpectedWhiteSpace,
 			lexerr.ExpectedComment,
-			lexerr.ExpectedUnicodeLetter)
+			lexerr.ExpectedPackageKeyword)
 	}
 }

@@ -28,9 +28,7 @@ var _ = DescribeTable("package", func(inp string, expErr OmegaMatcher, expOut ..
 	Entry("2", " \n "+`package foo`, BeNil(),
 		T(token.PACKAGE, `package`),
 		T(token.IDENT, `foo`)),
-	Entry("3", " \n "+`x`,
-		MatchError(MatchRegexp(`expected: 'package' keyword`))),
-	Entry("4", `
+	Entry("3", `
 			// comment 1
 
 			// comment 2
@@ -41,8 +39,8 @@ var _ = DescribeTable("package", func(inp string, expErr OmegaMatcher, expOut ..
 		T(token.PACKAGE, `package`),
 		T(token.IDENT, `foo`),
 	),
-	Entry("5", ``,
-		MatchError(MatchRegexp(`white space, comment or unicode letter`)), nil),
+	Entry("4", ``,
+		MatchError(MatchRegexp(`white space, comment or 'package' keyword`)), nil),
 )
 
 // T test utility for creating a token to compare against.

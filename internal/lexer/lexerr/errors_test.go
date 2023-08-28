@@ -34,8 +34,8 @@ var _ = Describe("unexpected", func() {
 	It("should format 3 expectations", func() {
 		Expect(lexerr.Unexpected('c',
 			lexerr.ExpectedWhiteSpace,
-			lexerr.ExpectedUnicodeLetter,
+			lexerr.ExpectedImportKeyword,
 			lexerr.ExpectedPackageKeyword,
-		)).To(MatchError(`unexpected input 'c', expected: white space, unicode letter or 'package' keyword`))
+		)).To(MatchError(`unexpected input 'c', expected: white space, 'import' keyword or 'package' keyword`))
 	})
 })

@@ -17,12 +17,16 @@ const (
 	ExpectedPackageKeyword ExpectCode = iota // 'package' keyword
 	// ExpectedImportKeyword codes the expectation of a import keyword.
 	ExpectedImportKeyword // 'import' keyword
+	// ExpectedFuncKeyword codes the expectation for a const keyword.
+	ExpectedFuncKeyword // 'func' keyword
+	// ExpectedVarKeyword codes the expectation for a const keyword.
+	ExpectedVarKeyword // 'var' keyword
+	// ExpectedConstKeyword codes the expectation for a const keyword.
+	ExpectedConstKeyword // 'const' keyword
 	// ExpectedLetter codes the expectation of a letter.
 	ExpectedLetter // letter
 	// ExpectedWhiteSpace codes the expectation of a white space.
 	ExpectedWhiteSpace // white space
-	// ExpectedUnicodeLetter codes the expectation of a unicode letter.
-	ExpectedUnicodeLetter // unicode letter
 	// ExpectedComment codes the expectation of a comment.
 	ExpectedComment // comment
 	// FirstCommentCharacter codes the expectation for the comment first forward slash.
