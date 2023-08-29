@@ -1,10 +1,12 @@
 package scanner_test
 
 import (
+	gotoken "go/token"
 	"testing"
 
 	"github.com/advanderveer/gor/internal/scanner"
 	"github.com/advanderveer/gor/internal/token"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -15,10 +17,33 @@ func TestScanner(t *testing.T) {
 	RunSpecs(t, "internal/scanner")
 }
 
+var _ = Describe("errors", func() {
+	It("should report correct line and file", func() {
+		var errPos gotoken.Position
+		var errMsg string
+
+		fset := gotoken.NewFileSet()
+		bytes1 := []byte("0x12\x00aaa")
+		file1 := fset.AddFile("file1.gor", -1, len(bytes1))
+		scanr := &scanner.Scanner{}
+		scanr.Init(file1, bytes1, func(pos gotoken.Position, msg string) {
+			errPos, errMsg = pos, msg
+		})
+
+		pos, tok, lit := scanr.Scan()
+		Expect(pos).To(Equal(gotoken.Pos(0)))
+		Expect(tok).To(Equal(token.INT))
+		Expect(lit).To(Equal("0x12"))
+
+		Expect(errPos).To(Equal(gotoken.Position{Filename: "file1.gor", Offset: 4, Line: 1, Column: 5}))
+		Expect(errMsg).To(MatchRegexp(`illegal character NUL`))
+	})
+})
+
 var _ = DescribeTable("scan one token", func(src string, expTok1 token.Token, expLit1 string) {
-	file := &token.File{}
+	file := &gotoken.File{}
 	scnr := &scanner.Scanner{}
-	scnr.Init(file, []byte(src))
+	scnr.Init(file, []byte(src), nil)
 
 	_, tok, lit := scnr.Scan()
 	Expect(tok).To(Equal(expTok1))
@@ -132,9 +157,9 @@ var _ = DescribeTable("scan three tokens", func(src string,
 	expTok2 token.Token, expLit2 string,
 	expTok3 token.Token, expLit3 string,
 ) {
-	file := &token.File{}
+	file := &gotoken.File{}
 	scnr := &scanner.Scanner{}
-	scnr.Init(file, []byte(src))
+	scnr.Init(file, []byte(src), nil)
 
 	_, tok, lit := scnr.Scan()
 	Expect(tok).To(Equal(expTok1), "token 1")

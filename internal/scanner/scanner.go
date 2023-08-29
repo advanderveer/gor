@@ -2,9 +2,10 @@
 package scanner
 
 import (
-	"fmt"
 	"unicode"
 	"unicode/utf8"
+
+	gotoken "go/token"
 
 	"github.com/advanderveer/gor/internal/token"
 )
@@ -14,11 +15,18 @@ const (
 	eof = -1
 )
 
+// An ErrorHandler may be provided to Scanner.Init. If a syntax error is
+// encountered and a handler was installed, the handler is called with a
+// position and an error message. The position points to the beginning of
+// the offending token.
+type ErrorHandler func(pos gotoken.Position, msg string)
+
 // Scanner is responsible for scanning source code text and breaking
 // it down into recognized tokens.
 type Scanner struct {
-	file *token.File
+	file *gotoken.File
 	src  []byte
+	eh   ErrorHandler
 
 	// scanning state
 	ch         rune // current character
@@ -29,9 +37,10 @@ type Scanner struct {
 }
 
 // Init resets and initializes the scanner so it can be reused.
-func (s *Scanner) Init(file *token.File, src []byte) {
+func (s *Scanner) Init(file *gotoken.File, src []byte, eh ErrorHandler) {
 	s.file = file
 	s.src = src
+	s.eh = eh
 	s.ch = ' '
 	s.offset = 0
 	s.rdOffset = 0
@@ -41,7 +50,9 @@ func (s *Scanner) Init(file *token.File, src []byte) {
 
 // error during scanning.
 func (s *Scanner) error(offs int, msg string) {
-	panic(fmt.Sprintf("error@%d: %s", offs, msg))
+	if s.eh != nil {
+		s.eh(s.file.Position(s.file.Pos(offs)), msg)
+	}
 }
 
 // peek returns the byte following the most recently read character without
@@ -155,7 +166,7 @@ func (s *Scanner) scanOpOrAssignOrOr(base, assign token.Token, ch2 rune, tok2, t
 }
 
 // Scan the next token while returning the position and literal value.
-func (s *Scanner) Scan() (pos token.Pos, tok token.Token, lit string) {
+func (s *Scanner) Scan() (pos gotoken.Pos, tok token.Token, lit string) {
 	s.skipWhitespace()
 
 	switch chr := s.ch; {
