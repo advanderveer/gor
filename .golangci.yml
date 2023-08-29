@@ -5,15 +5,24 @@ linters-settings:
   staticcheck:
     checks: ["all"]
   stylecheck:
-    checks: ["all"]
+    checks: ["all", "-ST1003"]
   funlen:
     lines: 200
+  cyclop:
+    max-complexity: 14
   varnamelen:
+    max-distance: 25
     ignore-names:
       - err # error values
       - db # database connections
       - ec # ent model client
       - tx # database transactions
+      - OR # or token
+  revive:
+    rules:
+      - name: var-naming
+        severity: warning
+        disabled: true # can't otherwise disable const ALL_CAPS rule
 linters:
   enable-all: true
   disable:
@@ -43,6 +52,16 @@ issues:
     - EXC0012 # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
     - EXC0014 # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
   exclude-rules:
+    - path: 'internal/scanner/.*\.go'
+      linters:
+        - cyclop
+        - gomnd
+        - nonamedreturns
+        - funlen
+        - gocognit
+        - gocyclo
+        - nlreturn
+        - wsl
     # Exclude some linters from running on tests files.
     - path: _test\.go
       linters:
