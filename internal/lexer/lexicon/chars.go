@@ -12,6 +12,16 @@ func isWhiteSpace(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\r' || isNewline(r)
 }
 
+// isAssign returns true if the rune is a single equal sign.
+func isAssign(r rune) bool {
+	return r == '='
+}
+
+// isComma returns true if the rune is a comma.
+func isComma(r rune) bool {
+	return r == ','
+}
+
 // isDoubleQuote returns true if the rune is a double quote.
 func isDoubleQuote(r rune) bool {
 	return r == '"'

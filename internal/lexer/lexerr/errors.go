@@ -41,6 +41,8 @@ const (
 	ExpectedStringLiteral // string literal
 	// ExpectedDoubleQuote codes the expectation for a double quote.
 	ExpectedDoubleQuote // double quote
+	// ExpectedComma codes the expectation for a comma.
+	ExpectedComma // comma
 )
 
 // UnexpectedError encodes the error for an unexpected character during tokenization.

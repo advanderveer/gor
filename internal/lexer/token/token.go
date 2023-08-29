@@ -11,16 +11,25 @@ const (
 	ILLEGAL Token = iota
 	// IDENT encodes an identifier.
 	IDENT
+
 	// PACKAGE keyword.
 	PACKAGE
 	// IMPORT keyword.
 	IMPORT
+	// VAR keyword.
+	VAR
+
 	// COMMENT holds source code comments.
 	COMMENT
 	// LPAREN is a left parenthesis.
 	LPAREN
 	// RPAREN is a right parenthesis.
 	RPAREN
+	// COMMA character.
+	COMMA
+	// ASSIGN character.
+	ASSIGN
+
 	// STRING describes a string literal.
 	STRING
 )

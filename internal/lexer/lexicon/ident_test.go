@@ -21,4 +21,20 @@ var _ = Describe("identifiers", func() {
 		Entry("4", `1abc`, MatchError(MatchRegexp(`expected: letter`)),
 			T(token.IDENT, `åβ`)),
 	)
+
+	DescribeTable("identifier lists", func(input string, expErr OmegaMatcher, expOut ...lexer.Item) {
+		out, err := lexer.New(input, lexIdentListAndThen(nil, isEOF)).Lex()
+		Expect(err).To(expErr)
+		if err == nil {
+			Expect(out).To(lexer.TokenValuesToBeEqual(expOut))
+		}
+	},
+		Entry("1", `a, b,`+"\n"+`_`, BeNil(),
+			T(token.IDENT, `a`),
+			T(token.COMMA, `,`),
+			T(token.IDENT, `b`),
+			T(token.COMMA, `,`),
+			T(token.IDENT, `_`),
+		),
+	)
 })

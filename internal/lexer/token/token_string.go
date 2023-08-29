@@ -12,15 +12,18 @@ func _() {
 	_ = x[IDENT-1]
 	_ = x[PACKAGE-2]
 	_ = x[IMPORT-3]
-	_ = x[COMMENT-4]
-	_ = x[LPAREN-5]
-	_ = x[RPAREN-6]
-	_ = x[STRING-7]
+	_ = x[VAR-4]
+	_ = x[COMMENT-5]
+	_ = x[LPAREN-6]
+	_ = x[RPAREN-7]
+	_ = x[COMMA-8]
+	_ = x[ASSIGN-9]
+	_ = x[STRING-10]
 }
 
-const _Token_name = "ILLEGALIDENTPACKAGEIMPORTCOMMENTLPARENRPARENSTRING"
+const _Token_name = "ILLEGALIDENTPACKAGEIMPORTVARCOMMENTLPARENRPARENCOMMAASSIGNSTRING"
 
-var _Token_index = [...]uint8{0, 7, 12, 19, 25, 32, 38, 44, 50}
+var _Token_index = [...]uint8{0, 7, 12, 19, 25, 28, 35, 41, 47, 52, 58, 64}
 
 func (i Token) String() string {
 	if i < 0 || i >= Token(len(_Token_index)-1) {

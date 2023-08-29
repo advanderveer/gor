@@ -22,11 +22,12 @@ func _() {
 	_ = x[ExpectedRightParenthesis-11]
 	_ = x[ExpectedStringLiteral-12]
 	_ = x[ExpectedDoubleQuote-13]
+	_ = x[ExpectedComma-14]
 }
 
-const _ExpectCode_name = "'package' keyword'import' keyword'func' keyword'var' keyword'const' keywordletterwhite spacecommentfirst comment charactersecond comment characterleft parenthesisright parenthesisstring literaldouble quote"
+const _ExpectCode_name = "'package' keyword'import' keyword'func' keyword'var' keyword'const' keywordletterwhite spacecommentfirst comment charactersecond comment characterleft parenthesisright parenthesisstring literaldouble quotecomma"
 
-var _ExpectCode_index = [...]uint8{0, 17, 33, 47, 60, 75, 81, 92, 99, 122, 146, 162, 179, 193, 205}
+var _ExpectCode_index = [...]uint8{0, 17, 33, 47, 60, 75, 81, 92, 99, 122, 146, 162, 179, 193, 205, 210}
 
 func (i ExpectCode) String() string {
 	if i < 0 || i >= ExpectCode(len(_ExpectCode_index)-1) {
