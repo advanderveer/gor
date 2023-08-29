@@ -5,111 +5,9 @@ import (
 	"fmt"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/advanderveer/gor/internal/token"
 )
-
-// File with source code.
-type File struct{}
-
-// AddLine adds the line offset for a new line.
-func (File) AddLine(int) {
-}
-
-// Pos encodes the position in a source file.
-type Pos int
-
-// Token encodes a scanned token.
-type Token int
-
-const (
-	// special tokens.
-	ILLEGAL Token = iota
-	EOF
-	IDENT
-	COMMENT
-
-	// keywords.
-	BREAK       // break
-	CONTINUE    // continue
-	FALLTHROUGH // fallthrough
-	RETURN      // return
-
-	// literals.
-	INT    // <int>
-	FLOAT  // <float>
-	STRING // <string>
-
-	SEMICOLON // ;
-	COLON     // :
-	PERIOD    // .
-	ELLIPSIS  // ...
-	COMMA     // ,
-	DEFINE    // :=
-	ARROW     // <-
-
-	INC // ++
-	DEC // --
-
-	ASSIGN // =
-	EQL    // ==
-	NEQ    // !=
-	NOT    // !
-
-	AND_NOT // &^
-	AND     // &
-	XOR     // ^
-	OR      // |
-	LAND    // &&
-	LOR     // ||
-
-	LPAREN // (
-	RPAREN // )
-	LBRACK // [
-	RBRACK // ]
-	LBRACE // {
-	RBRACE // }
-
-	LSS // <
-	LEQ // <=
-	SHL // <<
-	GTR // >
-	GEQ // >=
-	SHR // >>
-
-	QUO // /
-	MUL // *
-	ADD // +
-	SUB // -
-	REM // %
-
-	QUO_ASSIGN     // /=
-	MUL_ASSIGN     // *=
-	ADD_ASSIGN     // +=
-	SUB_ASSIGN     // -=
-	AND_NOT_ASSIGN // &^=
-	AND_ASSIGN     // &=
-	OR_ASSIGN      // |=
-	SHR_ASSIGN     // >>=
-	SHL_ASSIGN     // <<=
-	REM_ASSIGN     // %=
-	XOR_ASSIGN     // ^=
-)
-
-// AsToken determines if the literal is a keyword token, or
-// else an identifier.
-func AsToken(lit string) Token {
-	switch lit {
-	case "break":
-		return BREAK
-	case "continue":
-		return CONTINUE
-	case "fallthrough":
-		return FALLTHROUGH
-	case "return":
-		return RETURN
-	default:
-		return IDENT
-	}
-}
 
 const (
 	// end of file.
@@ -119,7 +17,7 @@ const (
 // Scanner is responsible for scanning source code text and breaking
 // it down into recognized tokens.
 type Scanner struct {
-	file *File
+	file *token.File
 	src  []byte
 
 	// scanning state
@@ -130,14 +28,15 @@ type Scanner struct {
 	lineOffset int  // current line offset
 }
 
-// New inits the source file tokenizer.
-func New(file *File, src []byte) *Scanner {
-	return &Scanner{
-		file:   file,
-		src:    src,
-		ch:     ' ',
-		offset: 0,
-	}
+// Init resets and initializes the scanner so it can be reused.
+func (s *Scanner) Init(file *token.File, src []byte) {
+	s.file = file
+	s.src = src
+	s.ch = ' '
+	s.offset = 0
+	s.rdOffset = 0
+	s.lineOffset = 0
+	s.insertSemi = false
 }
 
 // error during scanning.
@@ -210,7 +109,7 @@ func (s *Scanner) scanIdentifier() string {
 
 // scanOpOrAssign returns oof the two tokens based on wether the current
 // scanned char is '='.
-func (s *Scanner) scanOpOrAssign(base, assign Token) Token {
+func (s *Scanner) scanOpOrAssign(base, assign token.Token) token.Token {
 	if s.ch == '=' {
 		s.next()
 		return assign
@@ -221,7 +120,7 @@ func (s *Scanner) scanOpOrAssign(base, assign Token) Token {
 
 // scanOpOrAssign is a 3-way check for the base operator, assign variant or some
 // other variant triggered by 'ch2' argument.
-func (s *Scanner) scanOpOrAssignOr(base, assign Token, ch2 rune, tok2 Token) Token {
+func (s *Scanner) scanOpOrAssignOr(base, assign token.Token, ch2 rune, tok2 token.Token) token.Token {
 	if s.ch == '=' {
 		s.next()
 		return assign
@@ -237,7 +136,7 @@ func (s *Scanner) scanOpOrAssignOr(base, assign Token, ch2 rune, tok2 Token) Tok
 
 // scanOpOrAssignOrOr is a 4-way variant of the base token. Assign or more variants that
 // trigger depending on the 'ch2' argument.
-func (s *Scanner) scanOpOrAssignOrOr(base, assign Token, ch2 rune, tok2, tok3 Token) Token {
+func (s *Scanner) scanOpOrAssignOrOr(base, assign token.Token, ch2 rune, tok2, tok3 token.Token) token.Token {
 	if s.ch == '=' {
 		s.next()
 		return assign
@@ -256,17 +155,17 @@ func (s *Scanner) scanOpOrAssignOrOr(base, assign Token, ch2 rune, tok2, tok3 To
 }
 
 // Scan the next token while returning the position and literal value.
-func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
+func (s *Scanner) Scan() (pos token.Pos, tok token.Token, lit string) {
 	s.skipWhitespace()
 
 	switch chr := s.ch; {
 	// scan identifier or keyword if the current char is a letter
 	case isLetter(chr):
 		lit = s.scanIdentifier()
-		tok = AsToken(lit)
+		tok = token.Lookup(lit)
 
 		switch tok { //nolint:exhaustive
-		case IDENT, BREAK, CONTINUE, FALLTHROUGH, RETURN:
+		case token.IDENT, token.BREAK, token.CONTINUE, token.FALLTHROUGH, token.RETURN:
 			s.insertSemi = true
 		}
 
@@ -282,100 +181,100 @@ func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
 		case eof:
 			if s.insertSemi {
 				s.insertSemi = false // EOF consumed
-				return pos, SEMICOLON, "\n"
+				return pos, token.SEMICOLON, "\n"
 			}
 
-			tok = EOF
+			tok = token.EOF
 		case '/':
 			if s.ch == '/' {
-				tok = COMMENT
+				tok = token.COMMENT
 				lit = s.scanComment()
 			} else {
-				tok = s.scanOpOrAssign(QUO, QUO_ASSIGN)
+				tok = s.scanOpOrAssign(token.QUO, token.QUO_ASSIGN)
 			}
 		case '*':
-			tok = s.scanOpOrAssign(MUL, MUL_ASSIGN)
+			tok = s.scanOpOrAssign(token.MUL, token.MUL_ASSIGN)
 		case '\n':
 			// newline character, only reached if skipWhitespace was
 			// called with s.insertSemi set to true.
 			s.insertSemi = false // newline consumed
-			return pos, SEMICOLON, "\n"
+			return pos, token.SEMICOLON, "\n"
 		case '"':
 			s.insertSemi = true
-			tok = STRING
+			tok = token.STRING
 			lit = s.scanString()
 		case '`':
 			s.insertSemi = true
-			tok = STRING
+			tok = token.STRING
 			lit = s.scanRawString()
 		case ':':
-			tok = s.scanOpOrAssign(COLON, DEFINE)
+			tok = s.scanOpOrAssign(token.COLON, token.DEFINE)
 		case '.':
 			// fractions starting with a '.' are handled by outer switch
-			tok = PERIOD
+			tok = token.PERIOD
 			if s.ch == '.' && s.peek() == '.' {
 				s.next()
 				s.next() // consume last '.'
-				tok = ELLIPSIS
+				tok = token.ELLIPSIS
 			}
 		case ',':
-			tok = COMMA
+			tok = token.COMMA
 		case ';':
-			tok = SEMICOLON
+			tok = token.SEMICOLON
 			lit = ";"
 		case '(':
-			tok = LPAREN
+			tok = token.LPAREN
 		case ')':
 			s.insertSemi = true
-			tok = RPAREN
+			tok = token.RPAREN
 		case '[':
-			tok = LBRACK
+			tok = token.LBRACK
 		case ']':
 			s.insertSemi = true
-			tok = RBRACK
+			tok = token.RBRACK
 		case '{':
-			tok = LBRACE
+			tok = token.LBRACE
 		case '}':
 			s.insertSemi = true
-			tok = RBRACE
+			tok = token.RBRACE
 		case '+':
-			tok = s.scanOpOrAssignOr(ADD, ADD_ASSIGN, '+', INC)
-			if tok == INC {
+			tok = s.scanOpOrAssignOr(token.ADD, token.ADD_ASSIGN, '+', token.INC)
+			if tok == token.INC {
 				s.insertSemi = true
 			}
 		case '-':
-			tok = s.scanOpOrAssignOr(SUB, SUB_ASSIGN, '-', DEC)
-			if tok == DEC {
+			tok = s.scanOpOrAssignOr(token.SUB, token.SUB_ASSIGN, '-', token.DEC)
+			if tok == token.DEC {
 				s.insertSemi = true
 			}
 		case '=':
-			tok = s.scanOpOrAssign(ASSIGN, EQL)
+			tok = s.scanOpOrAssign(token.ASSIGN, token.EQL)
 		case '!':
-			tok = s.scanOpOrAssign(NOT, NEQ)
+			tok = s.scanOpOrAssign(token.NOT, token.NEQ)
 		case '<':
 			if s.ch == '-' {
 				s.next()
-				tok = ARROW
+				tok = token.ARROW
 			} else {
-				tok = s.scanOpOrAssignOrOr(LSS, LEQ, '<', SHL, SHL_ASSIGN)
+				tok = s.scanOpOrAssignOrOr(token.LSS, token.LEQ, '<', token.SHL, token.SHL_ASSIGN)
 			}
 		case '>':
-			tok = s.scanOpOrAssignOrOr(GTR, GEQ, '>', SHR, SHR_ASSIGN)
+			tok = s.scanOpOrAssignOrOr(token.GTR, token.GEQ, '>', token.SHR, token.SHR_ASSIGN)
 		case '&':
 			if s.ch == '^' {
 				s.next()
-				tok = s.scanOpOrAssign(AND_NOT, AND_NOT_ASSIGN)
+				tok = s.scanOpOrAssign(token.AND_NOT, token.AND_NOT_ASSIGN)
 			} else {
-				tok = s.scanOpOrAssignOr(AND, AND_ASSIGN, '&', LAND)
+				tok = s.scanOpOrAssignOr(token.AND, token.AND_ASSIGN, '&', token.LAND)
 			}
 		case '|':
-			tok = s.scanOpOrAssignOr(OR, OR_ASSIGN, '|', LOR)
+			tok = s.scanOpOrAssignOr(token.OR, token.OR_ASSIGN, '|', token.LOR)
 		case '%':
-			tok = s.scanOpOrAssign(REM, REM_ASSIGN)
+			tok = s.scanOpOrAssign(token.REM, token.REM_ASSIGN)
 		case '^':
-			tok = s.scanOpOrAssign(XOR, XOR_ASSIGN)
+			tok = s.scanOpOrAssign(token.XOR, token.XOR_ASSIGN)
 		default:
-			tok = ILLEGAL
+			tok = token.ILLEGAL
 			lit = string(chr)
 		}
 	}

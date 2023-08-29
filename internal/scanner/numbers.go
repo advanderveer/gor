@@ -1,5 +1,7 @@
 package scanner
 
+import "github.com/advanderveer/gor/internal/token"
+
 // scanDigits scans a series of digits.
 func (s *Scanner) scanDigits(base int, invalid *int) {
 	if base <= 10 {
@@ -20,16 +22,16 @@ func (s *Scanner) scanDigits(base int, invalid *int) {
 
 // scanNumber is called to scan a number given that the current
 // character is a decimal, or fractional starting with a period.
-func (s *Scanner) scanNumber() (Token, string) {
+func (s *Scanner) scanNumber() (token.Token, string) {
 	start := s.offset
-	tok := ILLEGAL
+	tok := token.ILLEGAL
 	base := 10        // number base
 	prefix := rune(0) // one of 0 (decimal), '0' (0-octal), 'x', 'o', or 'b'
 	invalid := -1     // index of invalid digit in literal, or < 0
 
 	// integer part
 	if s.ch != '.' {
-		tok = INT
+		tok = token.INT
 
 		if s.ch == '0' {
 			s.next()
@@ -54,7 +56,7 @@ func (s *Scanner) scanNumber() (Token, string) {
 
 	// fractional part
 	if s.ch == '.' {
-		tok = FLOAT
+		tok = token.FLOAT
 		if prefix == 'o' || prefix == 'b' {
 			s.error(s.offset, "invalid radix point in "+numberKind(prefix))
 		}

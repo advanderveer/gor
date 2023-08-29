@@ -18,11 +18,8 @@ linters-settings:
       - ec # ent model client
       - tx # database transactions
       - OR # or token
-  revive:
-    rules:
-      - name: var-naming
-        severity: warning
-        disabled: true # can't otherwise disable const ALL_CAPS rule
+      - GO # go token
+      - IF # if token
 linters:
   enable-all: true
   disable:
@@ -52,6 +49,11 @@ issues:
     - EXC0012 # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
     - EXC0014 # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
   exclude-rules:
+    - path: "internal/token/token.go"
+      linters:
+        - funlen
+        - cyclop
+        - revive
     - path: 'internal/scanner/.*\.go'
       linters:
         - cyclop
