@@ -1,6 +1,7 @@
 package scanner_test
 
 import (
+	goscanner "go/scanner"
 	gotoken "go/token"
 	"testing"
 
@@ -16,6 +17,60 @@ func TestScanner(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "internal/scanner")
 }
+
+var _ = DescribeTable("errors", func(src string, expToks []token.Token, expErr OmegaMatcher) {
+	errs := goscanner.ErrorList{}
+	fset := gotoken.NewFileSet()
+	file := fset.AddFile("file.gor", -1, len(src))
+
+	scanr := &scanner.Scanner{}
+	scanr.Init(file, []byte(src), errs.Add)
+
+	var toks []token.Token
+	for {
+		_, tok, _ := scanr.Scan()
+		toks = append(toks, tok)
+		if tok == token.EOF {
+			break
+		}
+	}
+
+	Expect(errs).To(expErr)
+	Expect(toks).To(Equal(expToks))
+},
+	Entry("1", "0x12\x00aaa",
+		[]token.Token{
+			token.INT,
+			token.ILLEGAL,
+			token.IDENT,
+			token.SEMICOLON,
+			token.EOF,
+		},
+		MatchError(MatchRegexp(`file.gor:1:5: illegal character NUL`))),
+
+	Entry("2", "`abc",
+		[]token.Token{
+			token.STRING,
+			token.SEMICOLON,
+			token.EOF,
+		},
+		MatchError(MatchRegexp(`file.gor:1:1: raw string literal not terminated`))),
+	Entry("3", "0b1.1",
+		[]token.Token{
+			token.FLOAT,
+			token.SEMICOLON,
+			token.EOF,
+		},
+		MatchError(MatchRegexp(`file.gor:1:4: invalid radix point in binary literal`))),
+
+	Entry("3", "0b777",
+		[]token.Token{
+			token.INT,
+			token.SEMICOLON,
+			token.EOF,
+		},
+		MatchError(MatchRegexp(`file.gor:1:3: invalid digit '7' in binary literal`))),
+)
 
 var _ = Describe("errors", func() {
 	It("should report correct line and file", func() {
@@ -81,11 +136,14 @@ var _ = DescribeTable("scan one token", func(src string, expTok1 token.Token, ex
 	Entry("keyword-25", "var", token.VAR, `var`),
 
 	// number scanning
-	Entry("number-26", `1`, token.INT, `1`),
-	Entry("number-27", `100`, token.INT, `100`),
-	Entry("number-28", `0xff`, token.INT, `0xff`),
-	Entry("number-29", `.1`, token.FLOAT, `.1`),
-	Entry("number-30", `1.1`, token.FLOAT, `1.1`),
+	Entry("number-1", `1`, token.INT, `1`),
+	Entry("number-2", `100`, token.INT, `100`),
+	Entry("number-3", `0xff`, token.INT, `0xff`),
+	Entry("number-4", `0o777`, token.INT, `0o777`),
+	Entry("number-4", `0b10101`, token.INT, `0b10101`),
+	Entry("number-4", `0g777`, token.INT, `0`),
+	Entry("number-5", `.1`, token.FLOAT, `.1`),
+	Entry("number-6", `1.1`, token.FLOAT, `1.1`),
 
 	// specials
 	Entry("special-31", `$`, token.ILLEGAL, `$`),

@@ -10,12 +10,7 @@ func (s *Scanner) scanComment() string {
 		for s.ch != '\n' && s.ch >= 0 {
 			s.next()
 		}
-
-		goto exit
 	}
 
-	s.error(start, "comment not terminated")
-
-exit:
 	return string(s.src[start:s.offset])
 }

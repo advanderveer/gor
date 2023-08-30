@@ -1,6 +1,10 @@
 package scanner
 
-import "github.com/advanderveer/gor/internal/token"
+import (
+	"fmt"
+
+	"github.com/advanderveer/gor/internal/token"
+)
 
 // scanDigits scans a series of digits.
 func (s *Scanner) scanDigits(base int, invalid *int) {
@@ -65,7 +69,12 @@ func (s *Scanner) scanNumber() (token.Token, string) {
 		s.scanDigits(base, &invalid)
 	}
 
-	return tok, string(s.src[start:s.offset])
+	lit := string(s.src[start:s.offset])
+	if tok == token.INT && invalid >= 0 {
+		s.error(invalid, fmt.Sprintf("invalid digit %q in %s", lit[invalid-start], numberKind(prefix)))
+	}
+
+	return tok, lit
 }
 
 // numberKind returns the kind of number for use in error messages.
