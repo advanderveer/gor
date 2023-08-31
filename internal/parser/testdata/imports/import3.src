@@ -1,0 +1,5 @@
+package import3
+
+import (
+    foo 111
+)

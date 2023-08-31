@@ -5,6 +5,11 @@ package token
 //go:generate go run golang.org/x/tools/cmd/stringer -type Token -linecomment
 type Token int
 
+// IsLiteral returns true if the token represents a literal token.
+func (tok Token) IsLiteral() bool {
+	return literal_beg < tok && tok < literal_end
+}
+
 const (
 	// special tokens.
 	ILLEGAL Token = iota // #illegal
@@ -40,9 +45,11 @@ const (
 	VAR         // var
 
 	// literals.
+	literal_beg
 	INT    // <int>
 	FLOAT  // <float>
 	STRING // <string>
+	literal_end
 
 	SEMICOLON // ;
 	COLON     // :

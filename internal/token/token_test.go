@@ -23,4 +23,9 @@ var _ = Describe("token", func() {
 	It("should print unexpected tokens", func() {
 		Expect(fmt.Sprint(token.Token(11111))).To(Equal("Token(11111)"))
 	})
+
+	It("should correctly do IsLiteral", func() {
+		Expect(token.STRING.IsLiteral()).To(BeTrue())
+		Expect(token.BREAK.IsLiteral()).To(BeFalse())
+	})
 })

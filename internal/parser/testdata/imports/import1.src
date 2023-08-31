@@ -1,0 +1,4 @@
+package import1
+
+import "foo"
+import "bar"

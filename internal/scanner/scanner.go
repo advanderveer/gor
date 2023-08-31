@@ -26,7 +26,7 @@ type Scanner struct {
 	// scanning state
 	ch         rune // current character
 	offset     int  // character offset
-	insertSemi bool // insert a semicolon before next newline
+	insertSemi bool // next scan may return a implicit semi colon
 	rdOffset   int  // reading offset (position after current character)
 	lineOffset int  // current line offset
 }

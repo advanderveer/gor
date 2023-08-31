@@ -2,22 +2,72 @@
 package parser
 
 import (
-	"go/token"
+	goscan "go/scanner"
+	gotoken "go/token"
 
+	"github.com/advanderveer/gor/internal/ast"
 	"github.com/advanderveer/gor/internal/scanner"
+	"github.com/advanderveer/gor/internal/token"
 )
 
 // Parser state.
 type Parser struct {
-	file    *token.File
-	scanner scanner.Scanner
+	file    *gotoken.File
+	scanner *scanner.Scanner
+	errors  goscan.ErrorList
+
+	// scanned token
+	pos gotoken.Pos
+	tok token.Token
+	lit string
 }
 
 // Init resets the parser state so it can be re-used.
-func (p *Parser) Init(fset *token.FileSet, filename string, src []byte) {
+func (p *Parser) Init(fset *gotoken.FileSet, filename string, src []byte) {
 	p.file = fset.AddFile(filename, -1, len(src))
+	p.errors = goscan.ErrorList{}
+	p.scanner = &scanner.Scanner{}
+	p.scanner.Init(p.file, src, p.errors.Add)
+	p.next()
+}
 
-	// @TODO include error handling
+// ParseFile parses a file.
+func ParseFile(fset *gotoken.FileSet, filename string, src []byte) (*ast.File, error) {
+	p := &Parser{}
+	p.Init(fset, filename, src)
 
-	p.scanner.Init(p.file, src, nil)
+	return p.parseFile(), p.errors.Err()
+}
+
+// next progresses the parser.
+func (p *Parser) next() {
+	p.pos, p.tok, p.lit = p.scanner.Scan()
+}
+
+// error repors a parsing error.
+func (p *Parser) error(pos gotoken.Pos, msg string) {
+	epos := p.file.Position(pos)
+	p.errors.Add(epos, msg)
+}
+
+// parseFile parses a file.
+func (p *Parser) parseFile() *ast.File {
+	pos := p.expect(token.PACKAGE)
+	ident := p.parseIdent()
+	p.expectSemi()
+
+	var decls []ast.Decl
+	for p.tok == token.IMPORT {
+		decls = append(decls, p.parseGenDecl(token.IMPORT, p.parseImportSpec))
+	}
+
+	// for p.tok != token.EOF {
+	// 	decls = append(decls, p.parseDecl())
+	// }
+
+	return &ast.File{
+		Name:    ident,
+		Package: pos,
+		Decls:   decls,
+	}
 }

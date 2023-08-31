@@ -1,0 +1,8 @@
+package import2
+
+import (
+    "baar"
+    foo "dar"
+    _ "deeed"
+    . "xez"
+)
