@@ -197,43 +197,47 @@ var _ = DescribeTable("scan one token", func(src string, expTok1 token.Token, ex
 )
 
 var _ = DescribeTable("scan three tokens", func(src string,
-	expTok1 token.Token, expLit1 string,
-	expTok2 token.Token, expLit2 string,
-	expTok3 token.Token, expLit3 string,
+	expTok1 token.Token, expLit1 string, expPos1 gotoken.Pos,
+	expTok2 token.Token, expLit2 string, expPos2 gotoken.Pos,
+	expTok3 token.Token, expLit3 string, expPos3 gotoken.Pos,
 ) {
-	file := &gotoken.File{}
+	fset := gotoken.NewFileSet()
+	file := fset.AddFile("file1.gor", -1, len(src))
 	scnr := &scanner.Scanner{}
 	scnr.Init(file, []byte(src), nil)
 
-	_, tok, lit := scnr.Scan()
+	pos, tok, lit := scnr.Scan()
 	Expect(tok).To(Equal(expTok1), "token 1")
 	Expect(lit).To(Equal(expLit1), "token 1")
+	Expect(pos).To(Equal(expPos1), "pos 1")
 
-	_, tok, lit = scnr.Scan()
+	pos, tok, lit = scnr.Scan()
 	Expect(tok).To(Equal(expTok2), "token 2")
 	Expect(lit).To(Equal(expLit2), "token 2")
+	Expect(pos).To(Equal(expPos2), "pos 2")
 
-	_, tok, lit = scnr.Scan()
+	pos, tok, lit = scnr.Scan()
 	Expect(tok).To(Equal(expTok3), "token 3")
 	Expect(lit).To(Equal(expLit3), "token 3")
+	Expect(pos).To(Equal(expPos3), "pos 3")
 },
 	Entry("semi before eof", `x`,
-		token.IDENT, `x`,
-		token.SEMICOLON, "\n",
-		token.EOF, "",
+		token.IDENT, `x`, gotoken.Pos(1),
+		token.SEMICOLON, "\n", gotoken.Pos(2),
+		token.EOF, "", gotoken.Pos(2),
 	),
 
 	Entry("semi after ident", `x
 	break`,
-		token.IDENT, `x`,
-		token.SEMICOLON, "\n",
-		token.BREAK, `break`,
+		token.IDENT, `x`, gotoken.Pos(1),
+		token.SEMICOLON, "\n", gotoken.Pos(2),
+		token.BREAK, `break`, gotoken.Pos(4),
 	),
 
 	Entry("comment with newline", `// foo
 	x`,
-		token.COMMENT, "// foo",
-		token.IDENT, "x",
-		token.SEMICOLON, "\n",
+		token.COMMENT, "// foo", gotoken.Pos(1),
+		token.IDENT, "x", gotoken.Pos(9),
+		token.SEMICOLON, "\n", gotoken.Pos(10),
 	),
 )
