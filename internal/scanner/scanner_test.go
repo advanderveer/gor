@@ -47,6 +47,15 @@ var _ = DescribeTable("errors", func(src string, expToks []token.Token, expErr O
 			token.EOF,
 		},
 		MatchError(MatchRegexp(`file.gor:1:5: illegal character NUL`))),
+	Entry("1", "0x12\x81aaa",
+		[]token.Token{
+			token.INT,
+			token.ILLEGAL,
+			token.IDENT,
+			token.SEMICOLON,
+			token.EOF,
+		},
+		MatchError(MatchRegexp(`file.gor:1:5: illegal UTF-8 encoding`))),
 
 	Entry("2", "`abc",
 		[]token.Token{
@@ -71,29 +80,6 @@ var _ = DescribeTable("errors", func(src string, expToks []token.Token, expErr O
 		},
 		MatchError(MatchRegexp(`file.gor:1:3: invalid digit '7' in binary literal`))),
 )
-
-var _ = Describe("errors", func() {
-	It("should report correct line and file", func() {
-		var errPos gotoken.Position
-		var errMsg string
-
-		fset := gotoken.NewFileSet()
-		bytes1 := []byte("0x12\x00aaa")
-		file1 := fset.AddFile("file1.gor", -1, len(bytes1))
-		scanr := &scanner.Scanner{}
-		scanr.Init(file1, bytes1, func(pos gotoken.Position, msg string) {
-			errPos, errMsg = pos, msg
-		})
-
-		pos, tok, lit := scanr.Scan()
-		Expect(pos).To(Equal(gotoken.Pos(0)))
-		Expect(tok).To(Equal(token.INT))
-		Expect(lit).To(Equal("0x12"))
-
-		Expect(errPos).To(Equal(gotoken.Position{Filename: "file1.gor", Offset: 4, Line: 1, Column: 5}))
-		Expect(errMsg).To(MatchRegexp(`illegal character NUL`))
-	})
-})
 
 var _ = DescribeTable("scan one token", func(src string, expTok1 token.Token, expLit1 string) {
 	file := &gotoken.File{}
