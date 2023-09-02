@@ -53,11 +53,14 @@ issues:
       linters:
         - exhaustive
         - gochecknoglobals
+        - wrapcheck
     - path: "internal/token/token.go"
       linters:
         - funlen
         - cyclop
         - revive
+        - gomnd
+        - exhaustive
     - path: 'internal/scanner/.*\.go'
       linters:
         - cyclop

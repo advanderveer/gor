@@ -1,0 +1,3 @@
+package varconst1
+
+const foo = "abc"

@@ -31,6 +31,18 @@ func (p *Parser) Init(fset *gotoken.FileSet, filename string, src []byte) {
 	p.next()
 }
 
+// ParseExpr parses a single expression.
+func ParseExpr(x string) (ast.Expr, error) {
+	p := &Parser{}
+	p.Init(gotoken.NewFileSet(), "", []byte(x))
+
+	expr := p.parseExpr()
+	p.expectSemi()
+	p.expect(token.EOF)
+
+	return expr, p.errors.Err()
+}
+
 // ParseFile parses a file.
 func ParseFile(fset *gotoken.FileSet, filename string, src []byte) (*ast.File, error) {
 	p := &Parser{}
@@ -57,13 +69,9 @@ func (p *Parser) parseFile() *ast.File {
 	p.expectSemi()
 
 	var decls []ast.Decl
-	for p.tok == token.IMPORT {
-		decls = append(decls, p.parseGenDecl(token.IMPORT, p.parseImportSpec))
+	for p.tok != token.EOF {
+		decls = append(decls, p.parseDecl(declStart))
 	}
-
-	// for p.tok != token.EOF {
-	// 	decls = append(decls, p.parseDecl())
-	// }
 
 	return &ast.File{
 		Name:    ident,

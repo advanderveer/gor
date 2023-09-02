@@ -5,6 +5,7 @@ import (
 	"github.com/advanderveer/gor/internal/token"
 )
 
+// parseIdent parses an identifier.
 func (p *Parser) parseIdent() *ast.Ident {
 	pos, name := p.pos, "_"
 

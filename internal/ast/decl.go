@@ -11,11 +11,6 @@ type Decl interface {
 	isDecl()
 }
 
-var (
-	_ Decl = &BadDecl{}
-	_ Decl = &GenDecl{}
-)
-
 // BadDecl represents a declaration that couldn't be parsed.
 type BadDecl struct {
 	From, To gotoken.Pos
@@ -34,11 +29,3 @@ type GenDecl struct {
 }
 
 func (d *GenDecl) isDecl() {}
-
-// ImportSpec represents a node for an import declaration.
-type ImportSpec struct {
-	Name *Ident    // local package name (including "."); or nil
-	Path *BasicLit // import path
-}
-
-func (s *ImportSpec) isSpec() {}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/advanderveer/gor/internal/ast"
 	"github.com/advanderveer/gor/internal/parser"
+	"github.com/advanderveer/gor/internal/token"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -18,7 +19,43 @@ func TestParser(t *testing.T) {
 	RunSpecs(t, "internal/parser")
 }
 
-var _ = DescribeTable("testdata",
+var _ = DescribeTable("parse expr", func(e string, expErr OmegaMatcher, f func(ast.Expr)) {
+	expr, err := parser.ParseExpr(e)
+	Expect(err).To(expErr)
+	f(expr)
+},
+	// errors
+	Entry("1", ``, MatchError(MatchRegexp(`expected operand`)), func(ast.Expr) {}),
+
+	// binary
+	Entry("1", `1+2`, BeNil(), func(e ast.Expr) {
+		be := e.(*ast.BinaryExpr)
+		Expect(be.X.(*ast.BasicLit).Value).To(Equal(`1`))
+		Expect(be.Y.(*ast.BasicLit).Value).To(Equal(`2`))
+		Expect(be.Op).To(Equal(token.ADD))
+	}),
+
+	Entry("1", `1+3*2`, BeNil(), func(e ast.Expr) {
+		be := e.(*ast.BinaryExpr)
+		Expect(be.X.(*ast.BasicLit).Value).To(Equal(`1`))
+		Expect(be.Y.(*ast.BinaryExpr).X.(*ast.BasicLit).Value).To(Equal(`3`))
+		Expect(be.Y.(*ast.BinaryExpr).Y.(*ast.BasicLit).Value).To(Equal(`2`))
+		Expect(be.Op).To(Equal(token.ADD))
+	}),
+
+	// unary
+	Entry("1", `!true`, BeNil(), func(e ast.Expr) {
+		be := e.(*ast.UnaryExpr)
+		Expect(be.X.(*ast.Ident).Name).To(Equal(`true`))
+		Expect(be.Op).To(Equal(token.NOT))
+	}),
+	Entry("1", `*Foo`, BeNil(), func(e ast.Expr) {
+		be := e.(*ast.StarExpr)
+		Expect(be.X.(*ast.Ident).Name).To(Equal(`Foo`))
+	}),
+)
+
+var _ = DescribeTable("parse testdata",
 	func(file string, expErr OmegaMatcher, f func(*ast.File)) {
 		src, err := os.ReadFile(file)
 		Expect(err).ToNot(HaveOccurred())
@@ -31,6 +68,11 @@ var _ = DescribeTable("testdata",
 			f(root)
 		}
 	},
+
+	//
+	// Import decl
+	//
+
 	Entry("1", "testdata/imports/import1.src", BeNil(), func(f *ast.File) {
 		Expect(f.Name.Name).To(Equal("import1"))
 		Expect(f.Decls).To(HaveLen(2))

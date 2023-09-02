@@ -28,4 +28,17 @@ var _ = Describe("token", func() {
 		Expect(token.STRING.IsLiteral()).To(BeTrue())
 		Expect(token.BREAK.IsLiteral()).To(BeFalse())
 	})
+
+	It("should return correct presedence", func() {
+		Expect(token.RETURN.Precedence()).To(Equal(token.LowestPrec))
+		Expect(token.LOR.Precedence()).To(Equal(1))
+		Expect(token.LAND.Precedence()).To(Equal(2))
+		Expect(token.EQL.Precedence()).To(Equal(3))
+		Expect(token.ADD.Precedence()).To(Equal(4))
+		Expect(token.MUL.Precedence()).To(Equal(5))
+	})
+
+	It("should lookup", func() {
+		Expect(token.Lookup("break")).To(Equal(token.BREAK))
+	})
 })

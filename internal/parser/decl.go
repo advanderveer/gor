@@ -11,32 +11,32 @@ import (
 type parseSpecFunction func(keyword token.Token, idx int) ast.Spec
 
 // parseDecl parses a declaration.
-// func (p *Parser) parseDecl() ast.Decl {
-// 	var f parseSpecFunction
+func (p *Parser) parseDecl(sync map[token.Token]bool) ast.Decl {
+	var f parseSpecFunction
 
-// 	switch p.tok {
-// 	case token.IMPORT:
-// 		f = p.parseImportSpec
+	switch p.tok {
+	case token.IMPORT:
+		f = p.parseImportSpec
 
-// 	case token.CONST, token.VAR:
-// 		panic("const/var: not implemented")
+	case token.CONST, token.VAR:
+		panic("var/const: not implemented")
 
-// 	case token.TYPE:
-// 		panic("type: not implemented")
+	case token.TYPE:
+		panic("type: not implemented")
 
-// 	case token.FUNC:
-// 		panic("func: not implemented")
+	case token.FUNC:
+		panic("func: not implemented")
 
-// 	default:
-// 		pos := p.pos
-// 		p.errorExpected(pos, "declaration")
-// 		p.advance(map[token.Token]bool{})
+	default:
+		pos := p.pos
+		p.errorExpected(pos, "declaration")
+		p.advance(sync)
 
-// 		return &ast.BadDecl{From: pos, To: p.pos}
-// 	}
+		return &ast.BadDecl{From: pos, To: p.pos}
+	}
 
-// 	return p.parseGenDecl(p.tok, f)
-// }
+	return p.parseGenDecl(p.tok, f)
+}
 
 // parseGenDecl represents the shared logic for parsing imports, const, var and type declarations.
 func (p *Parser) parseGenDecl(keyword token.Token, f parseSpecFunction) *ast.GenDecl {

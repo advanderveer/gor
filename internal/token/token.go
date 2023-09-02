@@ -10,6 +10,26 @@ func (tok Token) IsLiteral() bool {
 	return literal_beg < tok && tok < literal_end
 }
 
+// Precedence returns the operator precedence of the binary
+// operator op. If op is not a binary operator, the result
+// is LowestPrecedence.
+func (tok Token) Precedence() int {
+	switch tok {
+	case LOR:
+		return 1
+	case LAND:
+		return 2
+	case EQL, NEQ, LSS, LEQ, GTR, GEQ:
+		return 3
+	case ADD, SUB, OR, XOR:
+		return 4
+	case MUL, QUO, REM, SHL, SHR, AND, AND_NOT:
+		return 5
+	}
+
+	return LowestPrec
+}
+
 const (
 	// special tokens.
 	ILLEGAL Token = iota // #illegal
@@ -165,3 +185,14 @@ func Lookup(lit string) Token {
 		return IDENT
 	}
 }
+
+// A set of constants for precedence-based expression parsing.
+// Non-operators have lowest precedence, followed by operators
+// starting with precedence 1 up to unary operators. The highest
+// precedence serves as "catch-all" precedence for selector,
+// indexing, and other operator and delimiter tokens.
+const (
+	LowestPrec  = 0 // non-operators
+	UnaryPrec   = 6
+	HighestPrec = 7
+)

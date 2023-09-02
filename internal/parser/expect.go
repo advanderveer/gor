@@ -24,6 +24,7 @@ func (p *Parser) expectSemi() {
 		return
 	default:
 		p.errorExpected(p.pos, "';'")
+		p.advance(stmtStart)
 	}
 }
 
